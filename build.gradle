@@ -1,0 +1,44 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+repositories {
+    mavenLocal()
+
+    maven {
+        name 'Packet Loss Gaming Repository'
+        url 'https://mvn.packetloss.gg/'
+    }
+    maven {
+        name 'Paper Repository'
+        url 'https://papermc.io/repo/repository/maven-public/'
+    }
+}
+
+dependencies {
+    compileOnly group: 'com.destroystokyo.paper', name: 'paper-api', version: '1.16.1-R0.1-SNAPSHOT'
+    compileOnly group: 'com.destroystokyo.paper', name: 'paper', version: '1.16.1-R0.1-SNAPSHOT'
+}
+
+group = 'gg.packetloss'
+version = '1.16.1.0'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            url = System.getProperty("deploy-url")
+            credentials {
+                username = System.getProperty("deploy-username")
+                password = System.getProperty("deploy-password")
+            }
+        }
+    }
+}
