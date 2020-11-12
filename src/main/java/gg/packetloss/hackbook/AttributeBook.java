@@ -7,10 +7,10 @@
 package gg.packetloss.hackbook;
 
 import gg.packetloss.hackbook.exceptions.UnsupportedFeatureException;
-import net.minecraft.server.v1_16_R1.AttributeBase;
-import net.minecraft.server.v1_16_R1.EntityInsentient;
-import net.minecraft.server.v1_16_R1.GenericAttributes;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftLivingEntity;
+import net.minecraft.server.v1_16_R3.AttributeBase;
+import net.minecraft.server.v1_16_R3.EntityInsentient;
+import net.minecraft.server.v1_16_R3.GenericAttributes;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.LivingEntity;
 
 public class AttributeBook {

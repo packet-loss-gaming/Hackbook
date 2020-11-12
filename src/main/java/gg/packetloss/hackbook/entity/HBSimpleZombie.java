@@ -12,10 +12,10 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.TaggedChoice;
 import gg.packetloss.hackbook.DataMigrator;
-import net.minecraft.server.v1_16_R1.*;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -71,7 +71,7 @@ public class HBSimpleZombie extends EntityZombie {
     public static Zombie spawn(Location loc) {
         register();
 
-        World world = ((CraftWorld) loc.getWorld()).getHandle();
+        WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
         Entity nmsEntity = registration.a(world);
         nmsEntity.setPosition(loc.getX(), loc.getY(), loc.getZ());
 

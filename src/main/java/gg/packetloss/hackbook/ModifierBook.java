@@ -7,8 +7,8 @@
 package gg.packetloss.hackbook;
 
 import gg.packetloss.hackbook.exceptions.UnsupportedFeatureException;
-import net.minecraft.server.v1_16_R1.*;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
@@ -133,7 +133,7 @@ public class ModifierBook {
 
     public static ItemStack cloneWithSpecifiedModifiers(ItemStack stack, List<Modifier> modifierList) throws UnsupportedFeatureException {
         try {
-            net.minecraft.server.v1_16_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
+            net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
             NBTTagCompound compound = nmsStack.getTag();
             if (compound == null) {

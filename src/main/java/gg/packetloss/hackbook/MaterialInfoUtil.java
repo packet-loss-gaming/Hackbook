@@ -6,12 +6,12 @@
 
 package gg.packetloss.hackbook;
 
-import net.minecraft.server.v1_16_R1.ItemTool;
+import net.minecraft.server.v1_16_R3.ItemTool;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
 
 public class MaterialInfoUtil {

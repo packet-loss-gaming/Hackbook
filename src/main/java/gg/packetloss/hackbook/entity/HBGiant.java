@@ -12,10 +12,10 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.TaggedChoice;
 import gg.packetloss.hackbook.DataMigrator;
-import net.minecraft.server.v1_16_R1.*;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Giant;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -76,7 +76,7 @@ public class HBGiant extends EntityGiantZombie {
         register();
 
         World world = ((CraftWorld) loc.getWorld()).getHandle();
-        net.minecraft.server.v1_16_R1.Entity nmsEntity = registration.a(world);
+        net.minecraft.server.v1_16_R3.Entity nmsEntity = registration.a(world);
         nmsEntity.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
         world.addEntity(nmsEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
