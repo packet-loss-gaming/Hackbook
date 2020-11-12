@@ -23,29 +23,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class HBGiant extends EntityGiantZombie {
+public class HBGiant {
     private static boolean registered = false;
-    private static  EntityTypes<?> registration;
+    private static EntityTypes<?> registration;
 
-    public HBGiant(EntityTypes<? extends EntityGiantZombie> var0, World var1) {
-        super(EntityTypes.GIANT, var1); // This ensures the giant shows and saves as a giant, instead of some custom
-                                        // invalid custom type. However, this also means that the this giant will
-                                        // not be restored to this class. So, we have to be careful to ensure we
-                                        // recreate the giant when coming from disk.
-    }
-
-    @Override
-    protected void initPathfinder() {
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.23D);
-        this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(12.0D);
-
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));
-        this.goalSelector.a(8, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 8.0F));
-        this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-        this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
-        this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, new Class[0]));
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
-    }
+    private HBGiant() { }
 
     private static void register() {
         if (registered) {
@@ -65,7 +47,7 @@ public class HBGiant extends EntityGiantZombie {
             Method m = EntityTypes.class.getDeclaredMethod("a", String.class, EntityTypes.Builder.class);
             m.setAccessible(true);
 
-            EntityTypes.Builder<Entity> b = EntityTypes.Builder.a(HBGiant::new, EnumCreatureType.MONSTER).a(3.6F, 12.0F);
+            EntityTypes.Builder<Entity> b = EntityTypes.Builder.a(HBGiantInternal::new, EnumCreatureType.MONSTER).a(3.6F, 12.0F);
             registration = (EntityTypes<?>) m.invoke(null, "hb_giant", b);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
@@ -85,6 +67,6 @@ public class HBGiant extends EntityGiantZombie {
     }
 
     public static boolean is(org.bukkit.entity.Entity entity) {
-        return ((CraftEntity) entity).getHandle() instanceof HBGiant;
+        return ((CraftEntity) entity).getHandle() instanceof HBGiantInternal;
     }
 }

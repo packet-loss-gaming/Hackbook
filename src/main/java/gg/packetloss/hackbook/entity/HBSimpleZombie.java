@@ -23,25 +23,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class HBSimpleZombie extends EntityZombie {
+public class HBSimpleZombie {
     private static boolean registered = false;
     private static  EntityTypes<?> registration;
 
-    public HBSimpleZombie(EntityTypes<? extends EntityZombie> var0, World var1) {
-        super(EntityTypes.ZOMBIE, var1); // This ensures the zombie shows and saves as a zombie, instead of some custom
-                                         // invalid custom type. However, this also means that the this zombie will
-                                         // not be restored to this class.
-    }
-
-    @Override
-    protected void initPathfinder() {
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));
-        this.goalSelector.a(8, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 8.0F));
-        this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-        this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
-        this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, new Class[0]));
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
-    }
+    private HBSimpleZombie() { }
 
     private static void register() {
         if (registered) {
@@ -61,7 +47,7 @@ public class HBSimpleZombie extends EntityZombie {
             Method m = EntityTypes.class.getDeclaredMethod("a", String.class, EntityTypes.Builder.class);
             m.setAccessible(true);
 
-            EntityTypes.Builder<Entity> b = EntityTypes.Builder.a(HBSimpleZombie::new, EnumCreatureType.MONSTER).a(0.6F, 1.95F);
+            EntityTypes.Builder<Entity> b = EntityTypes.Builder.a(HBSimpleZombieInternal::new, EnumCreatureType.MONSTER).a(0.6F, 1.95F);
             registration = (EntityTypes<?>) m.invoke(null, "hb_zombie", b);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
@@ -76,11 +62,11 @@ public class HBSimpleZombie extends EntityZombie {
         nmsEntity.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
         ((EntityInsentient) nmsEntity).prepare(
-                world,
-                world.getDamageScaler(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())),
-                EnumMobSpawn.COMMAND,
-                null,
-                null
+            world,
+            world.getDamageScaler(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())),
+            EnumMobSpawn.COMMAND,
+            null,
+            null
         );
 
         // Reset the zombie
@@ -94,6 +80,6 @@ public class HBSimpleZombie extends EntityZombie {
     }
 
     public static boolean is(org.bukkit.entity.Entity entity) {
-        return ((CraftEntity) entity).getHandle() instanceof HBSimpleZombie;
+        return ((CraftEntity) entity).getHandle() instanceof HBSimpleZombieInternal;
     }
 }

@@ -20,7 +20,7 @@ dependencies {
 }
 
 group = 'gg.packetloss'
-version = '1.16.4.0'
+version = '1.16.4.1'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
