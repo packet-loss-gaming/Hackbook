@@ -22,8 +22,11 @@ dependencies {
 group = 'gg.packetloss'
 version = '1.16.4.5'
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+}
 
 publishing {
     publications {
