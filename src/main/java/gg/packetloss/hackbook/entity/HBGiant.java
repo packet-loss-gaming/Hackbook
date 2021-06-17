@@ -12,10 +12,15 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.TaggedChoice;
 import gg.packetloss.hackbook.DataMigrator;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.entity.Giant;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -25,7 +30,7 @@ import java.util.Map;
 
 public class HBGiant {
     private static boolean registered = false;
-    private static EntityTypes<?> registration;
+    private static EntityType<?> registration;
 
     private HBGiant() { }
 
@@ -36,19 +41,19 @@ public class HBGiant {
 
         registered = true;
 
-        DataFixer registry = DataConverterRegistry.a();
+        DataFixer registry = DataFixers.getDataFixer();
         Schema currentSchema = registry.getSchema(DataFixUtils.makeKey(DataMigrator.getCurrentVersion()));
-        TaggedChoice.TaggedChoiceType<?> entityNameConverter = currentSchema.findChoiceType(DataConverterTypes.ENTITY);
+        TaggedChoice.TaggedChoiceType<?> entityNameConverter = currentSchema.findChoiceType(References.ENTITY);
 
         Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) entityNameConverter.types();
         dataTypes.put("minecraft:hb_giant", dataTypes.get("minecraft:giant"));
 
         try {
-            Method m = EntityTypes.class.getDeclaredMethod("a", String.class, EntityTypes.Builder.class);
+            Method m = EntityType.class.getDeclaredMethod("register", String.class, EntityType.Builder.class);
             m.setAccessible(true);
 
-            EntityTypes.Builder<Entity> b = EntityTypes.Builder.a(HBGiantInternal::new, EnumCreatureType.MONSTER).a(3.6F, 12.0F);
-            registration = (EntityTypes<?>) m.invoke(null, "hb_giant", b);
+            EntityType.Builder<Entity> b = EntityType.Builder.of(HBGiantInternal::new, MobCategory.MONSTER).sized(3.6F, 12.0F);
+            registration = (EntityType<?>) m.invoke(null, "hb_giant", b);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
         }
@@ -57,9 +62,9 @@ public class HBGiant {
     public static Giant spawn(Location loc) {
         register();
 
-        World world = ((CraftWorld) loc.getWorld()).getHandle();
-        net.minecraft.server.v1_16_R3.Entity nmsEntity = registration.a(world);
-        nmsEntity.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
+        net.minecraft.world.entity.Entity nmsEntity = registration.create(world);
+        nmsEntity.setPos(loc.getX(), loc.getY(), loc.getZ());
 
         world.addEntity(nmsEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
 

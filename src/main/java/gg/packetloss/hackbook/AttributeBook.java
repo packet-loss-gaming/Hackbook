@@ -7,36 +7,32 @@
 package gg.packetloss.hackbook;
 
 import gg.packetloss.hackbook.exceptions.UnsupportedFeatureException;
-import net.minecraft.server.v1_16_R3.AttributeBase;
-import net.minecraft.server.v1_16_R3.EntityInsentient;
-import net.minecraft.server.v1_16_R3.GenericAttributes;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.LivingEntity;
 
 public class AttributeBook {
-
     public enum Attribute {
+        MAX_HEALTH(Attributes.MAX_HEALTH),
+        FOLLOW_RANGE(Attributes.FOLLOW_RANGE),
+        KNOCKBACK_RESISTANCE(Attributes.KNOCKBACK_RESISTANCE),
+        MOVEMENT_SPEED(Attributes.MOVEMENT_SPEED),
+        ATTACK_KNOCKBACK(Attributes.ATTACK_KNOCKBACK),
+        ATTACK_DAMAGE(Attributes.ATTACK_DAMAGE);
 
-        MAX_HEALTH(GenericAttributes.MAX_HEALTH),
-        FOLLOW_RANGE(GenericAttributes.FOLLOW_RANGE),
-        KNOCKBACK_RESISTANCE(GenericAttributes.KNOCKBACK_RESISTANCE),
-        MOVEMENT_SPEED(GenericAttributes.MOVEMENT_SPEED),
-        ATTACK_KNOCKBACK(GenericAttributes.ATTACK_KNOCKBACK),
-        ATTACK_DAMAGE(GenericAttributes.ATTACK_DAMAGE);
+        public final net.minecraft.world.entity.ai.attributes.Attribute attribute;
 
-        public final AttributeBase attribute;
-
-        Attribute(AttributeBase attribute) {
+        Attribute(net.minecraft.world.entity.ai.attributes.Attribute attribute) {
             this.attribute = attribute;
         }
     }
 
     public static double getAttribute(LivingEntity entity, Attribute attribute) throws UnsupportedFeatureException {
-
         try {
-            EntityInsentient nmsEntity = getNMSEntity(entity);
+            Mob nmsEntity = getNMSEntity(entity);
 
-            return nmsEntity.getAttributeInstance(attribute.attribute).getValue();
+            return nmsEntity.getAttribute(attribute.attribute).getBaseValue();
         } catch (Throwable t) {
             t.printStackTrace();
             throw new UnsupportedFeatureException();
@@ -44,21 +40,19 @@ public class AttributeBook {
     }
 
     public static void setAttribute(LivingEntity entity, Attribute attribute, double value) throws UnsupportedFeatureException {
-
         try {
-            EntityInsentient nmsEntity = getNMSEntity(entity);
+            Mob nmsEntity = getNMSEntity(entity);
 
-            nmsEntity.getAttributeInstance(attribute.attribute).setValue(value);
+            nmsEntity.getAttribute(attribute.attribute).setBaseValue(value);
         } catch (Throwable t) {
             t.printStackTrace();
             throw new UnsupportedFeatureException();
         }
     }
 
-    private static EntityInsentient getNMSEntity(LivingEntity entity) throws UnsupportedFeatureException {
-
+    private static Mob getNMSEntity(LivingEntity entity) throws UnsupportedFeatureException {
         try {
-            return ((EntityInsentient) ((CraftLivingEntity) entity).getHandle());
+            return ((Mob) ((CraftLivingEntity) entity).getHandle());
         } catch (Throwable t) {
             t.printStackTrace();
             throw new UnsupportedFeatureException();

@@ -6,26 +6,41 @@
 
 package gg.packetloss.hackbook.entity;
 
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
-class HBGiantInternal extends EntityGiantZombie {
-    public HBGiantInternal(EntityTypes<? extends EntityGiantZombie> var0, World var1) {
-        super(EntityTypes.GIANT, var1); // This ensures the giant shows and saves as a giant, instead of some custom
-                                        // invalid custom type. However, this also means that the this giant will
-                                        // not be restored to this class. So, we have to be careful to ensure we
-                                        // recreate the giant when coming from disk.
+class HBGiantInternal extends Giant implements EntityType.EntityFactory<Giant> {
+    public HBGiantInternal(EntityType<? extends Giant> var0, Level var1) {
+        super(EntityType.GIANT, var1); // This ensures the giant shows and saves as a giant, instead of some custom
+                                       // invalid custom type. However, this also means that the this giant will
+                                       // not be restored to this class. So, we have to be careful to ensure we
+                                       // recreate the giant when coming from disk.
     }
 
     @Override
-    protected void initPathfinder() {
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.23D);
-        this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(12.0D);
+    public Giant create(EntityType<Giant> entityType, Level level) {
+        return new HBGiantInternal(entityType, level);
+    }
 
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));
-        this.goalSelector.a(8, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 8.0F));
-        this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-        this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
-        this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, new Class[0]));
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
+    @Override
+    protected void registerGoals() {
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.23D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(12.0D);
+
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false));
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0D));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 }

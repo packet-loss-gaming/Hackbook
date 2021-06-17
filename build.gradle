@@ -15,12 +15,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly group: 'com.destroystokyo.paper', name: 'paper-api', version: '1.16.4-R0.1-SNAPSHOT'
-    compileOnly group: 'com.destroystokyo.paper', name: 'paper', version: '1.16.4-R0.1-SNAPSHOT'
+    compileOnly group: 'io.papermc.paper', name: 'Paper-API', version: '1.17-R0.1-SNAPSHOT'
+    compileOnly group: 'io.papermc.paper', name: 'Paper-Server', version: '1.17-R0.1-SNAPSHOT', classifier: 'all'
 }
 
 group = 'gg.packetloss'
-version = '1.16.4.5'
+version = '1.17.0.0'
 
 java {
     toolchain {

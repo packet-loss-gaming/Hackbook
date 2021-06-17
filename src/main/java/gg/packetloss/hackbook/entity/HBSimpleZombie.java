@@ -12,10 +12,14 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.TaggedChoice;
 import gg.packetloss.hackbook.DataMigrator;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.world.entity.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -25,7 +29,7 @@ import java.util.Map;
 
 public class HBSimpleZombie {
     private static boolean registered = false;
-    private static  EntityTypes<?> registration;
+    private static EntityType<?> registration;
 
     private HBSimpleZombie() { }
 
@@ -36,19 +40,19 @@ public class HBSimpleZombie {
 
         registered = true;
 
-        DataFixer registry = DataConverterRegistry.a();
+        DataFixer registry = DataFixers.getDataFixer();
         Schema currentSchema = registry.getSchema(DataFixUtils.makeKey(DataMigrator.getCurrentVersion()));
-        TaggedChoice.TaggedChoiceType<?> entityNameConverter = currentSchema.findChoiceType(DataConverterTypes.ENTITY);
+        TaggedChoice.TaggedChoiceType<?> entityNameConverter = currentSchema.findChoiceType(References.ENTITY);
 
         Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) entityNameConverter.types();
         dataTypes.put("minecraft:hb_zombie", dataTypes.get("minecraft:zombie"));
 
         try {
-            Method m = EntityTypes.class.getDeclaredMethod("a", String.class, EntityTypes.Builder.class);
+            Method m = EntityType.class.getDeclaredMethod("register", String.class, EntityType.Builder.class);
             m.setAccessible(true);
 
-            EntityTypes.Builder<Entity> b = EntityTypes.Builder.a(HBSimpleZombieInternal::new, EnumCreatureType.MONSTER).a(0.6F, 1.95F);
-            registration = (EntityTypes<?>) m.invoke(null, "hb_zombie", b);
+            EntityType.Builder<Entity> b = EntityType.Builder.of(HBSimpleZombieInternal::new, MobCategory.MONSTER).sized(0.6F, 1.95F);
+            registration = (EntityType<?>) m.invoke(null, "hb_zombie", b);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
         }
@@ -57,14 +61,14 @@ public class HBSimpleZombie {
     public static Zombie spawn(Location loc) {
         register();
 
-        WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
-        Entity nmsEntity = registration.a(world);
-        nmsEntity.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
+        Entity nmsEntity = registration.create(world);
+        nmsEntity.setPos(loc.getX(), loc.getY(), loc.getZ());
 
-        ((EntityInsentient) nmsEntity).prepare(
+        ((Mob) nmsEntity).finalizeSpawn(
             world,
-            world.getDamageScaler(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())),
-            EnumMobSpawn.COMMAND,
+            world.getCurrentDifficultyAt(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())),
+            MobSpawnType.COMMAND,
             null,
             null
         );

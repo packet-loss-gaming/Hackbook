@@ -7,8 +7,9 @@
 package gg.packetloss.hackbook;
 
 import gg.packetloss.hackbook.exceptions.UnsupportedFeatureException;
-import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
@@ -113,41 +114,41 @@ public class ModifierBook {
             UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), "generic.attackSpeed"
     );
 
-    private static NBTTagCompound buildModifierTag(Modifier modifier) {
-        NBTTagCompound modifierTag = new NBTTagCompound();
+    private static CompoundTag buildModifierTag(Modifier modifier) {
+        CompoundTag modifierTag = new CompoundTag();
 
         Slot slot = modifier.getSlot();
         if (slot != null) {
-            modifierTag.set("Slot", NBTTagString.a(slot.getName()));
+            modifierTag.putString("Slot", slot.getName());
         }
 
-        modifierTag.set("AttributeName", NBTTagString.a(modifier.getModifierName()));
-        modifierTag.set("Name", NBTTagString.a(modifier.getModifierName()));
-        modifierTag.set("Amount", NBTTagDouble.a(modifier.getValue()));
-        modifierTag.set("Operation", NBTTagInt.a(modifier.getOperation().getOpCode()));
-        modifierTag.set("UUIDLeast", NBTTagInt.a((int) modifier.getModifierID().getLeastSignificantBits()));
-        modifierTag.set("UUIDMost", NBTTagInt.a((int) modifier.getModifierID().getMostSignificantBits()));
+        modifierTag.putString("AttributeName", modifier.getModifierName());
+        modifierTag.putString("Name", modifier.getModifierName());
+        modifierTag.putDouble("Amount", modifier.getValue());
+        modifierTag.putInt("Operation", modifier.getOperation().getOpCode());
+        modifierTag.putInt("UUIDLeast", (int) modifier.getModifierID().getLeastSignificantBits());
+        modifierTag.putInt("UUIDMost", (int) modifier.getModifierID().getMostSignificantBits());
 
         return modifierTag;
     }
 
     public static ItemStack cloneWithSpecifiedModifiers(ItemStack stack, List<Modifier> modifierList) throws UnsupportedFeatureException {
         try {
-            net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
+            net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
-            NBTTagCompound compound = nmsStack.getTag();
+            CompoundTag compound = nmsStack.getTag();
             if (compound == null) {
-                nmsStack.setTag(new NBTTagCompound());
+                nmsStack.setTag(new CompoundTag());
                 compound = nmsStack.getTag();
             }
 
-            NBTTagList modifiers = new NBTTagList();
+            ListTag modifiers = new ListTag();
 
             for (Modifier modifier : modifierList) {
                 modifiers.add(buildModifierTag(modifier));
             }
 
-            compound.set("AttributeModifiers", modifiers);
+            compound.put("AttributeModifiers", modifiers);
 
             return CraftItemStack.asBukkitCopy(nmsStack);
         } catch (Throwable t) {
