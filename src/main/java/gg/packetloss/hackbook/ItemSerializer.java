@@ -6,9 +6,9 @@
 
 package gg.packetloss.hackbook;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NBTCompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import org.apache.commons.lang.Validate;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class ItemSerializer {
-    private static CompoundTag toTag(ItemStack stack) {
-        CompoundTag compound = new CompoundTag();
+    private static NBTTagCompound toTag(ItemStack stack) {
+        NBTTagCompound compound = new NBTTagCompound();
         CraftItemStack.asNMSCopy(stack).save(compound);
         return compound;
     }
@@ -32,41 +32,41 @@ public class ItemSerializer {
     }
 
     public static void writeToOutputStream(ItemStack stack, OutputStream stream) throws IOException {
-        NbtIo.writeCompressed(toTag(stack), stream);
+        NBTCompressedStreamTools.a(toTag(stack), stream);
     }
 
     public static void writeToOutputStream(Collection<ItemStack> stacks, OutputStream stream) throws IOException {
-        CompoundTag compoundTag = new CompoundTag();
+        NBTTagCompound compoundTag = new NBTTagCompound();
 
-        ListTag tag = new ListTag();
+        NBTTagList tag = new NBTTagList();
         for (ItemStack stack : stacks) {
             tag.add(toTag(stack));
         }
 
-        compoundTag.put("elements", tag);
-        compoundTag.putInt("DataVersion", DataMigrator.getCurrentVersion());
+        compoundTag.set("elements", tag);
+        compoundTag.setInt("DataVersion", DataMigrator.getCurrentVersion());
 
-        NbtIo.writeCompressed(compoundTag, stream);
+        NBTCompressedStreamTools.a(compoundTag, stream);
     }
 
     public static List<ItemStack> fromInputStream(InputStream stream, boolean migrate) throws IOException {
-        CompoundTag compoundTag = NbtIo.readCompressed(stream);
+        NBTTagCompound compoundTag = NBTCompressedStreamTools.a(stream);
 
-        ListTag tag = (ListTag) compoundTag.get("elements");
+        NBTTagList tag = (NBTTagList) compoundTag.get("elements");
 
-        Validate.isTrue(compoundTag.contains("DataVersion"));
+        Validate.isTrue(compoundTag.hasKey("DataVersion"));
         int prevVersion = compoundTag.getInt("DataVersion") ;
 
         List<ItemStack> stacks = new ArrayList<>(tag.size());
 
         for (int i = 0; i < tag.size(); ++i) {
-            CompoundTag itemTag = tag.getCompound(i);
+            NBTTagCompound itemTag = tag.getCompound(i);
 
             if (migrate) {
                 itemTag = DataMigrator.updateItemStack(prevVersion, itemTag);
             }
 
-            stacks.add(CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.of(itemTag)));
+            stacks.add(CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.a(itemTag)));
         }
 
         return stacks;

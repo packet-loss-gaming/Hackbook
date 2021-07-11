@@ -10,28 +10,28 @@ import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.SharedConstants;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.util.datafix.DataFixers;
-import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.nbt.DynamicOpsNBT;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.datafix.DataConverterRegistry;
+import net.minecraft.util.datafix.fixes.DataConverterTypes;
 
 public class DataMigrator {
-    private static CompoundTag runFixer(int prevVersion, DSL.TypeReference typeReference, CompoundTag tag) {
-        DataFixer fixer = DataFixers.getDataFixer();
+    private static NBTTagCompound runFixer(int prevVersion, DSL.TypeReference typeReference, NBTTagCompound tag) {
+        DataFixer fixer = DataConverterRegistry.a();
 
-        return (CompoundTag) fixer.update(
+        return (NBTTagCompound) fixer.update(
                 typeReference,
-                new Dynamic<>(NbtOps.INSTANCE, tag),
+                new Dynamic<>(DynamicOpsNBT.a, tag),
                 prevVersion,
                 getCurrentVersion()
         ).getValue();
     }
 
-    protected static CompoundTag updateItemStack(int prevVersion, CompoundTag tag) {
-        return runFixer(prevVersion, References.ITEM_STACK, tag);
+    protected static NBTTagCompound updateItemStack(int prevVersion, NBTTagCompound tag) {
+        return runFixer(prevVersion, DataConverterTypes.m, tag);
     }
 
     public static int getCurrentVersion() {
-        return SharedConstants.getCurrentVersion().getWorldVersion();
+        return SharedConstants.getGameVersion().getWorldVersion();
     }
 }

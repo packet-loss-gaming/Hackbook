@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     compileOnly group: 'io.papermc.paper', name: 'Paper-API', version: '1.17-R0.1-SNAPSHOT'
-    compileOnly group: 'io.papermc.paper', name: 'Paper-Server', version: '1.17-R0.1-SNAPSHOT', classifier: 'all'
+    compileOnly group: 'io.papermc.paper', name: 'Paper-Server', version: '1.17-R0.1-SNAPSHOT', classifier: 'reobf'
 }
 
 group = 'gg.packetloss'
