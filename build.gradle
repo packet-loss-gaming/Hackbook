@@ -1,5 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'io.papermc.paperweight.userdev' version '1.3.2'
+}
 
 repositories {
     mavenLocal()
@@ -15,16 +18,15 @@ repositories {
 }
 
 dependencies {
-    compileOnly group: 'io.papermc.paper', name: 'Paper-API', version: '1.17-R0.1-SNAPSHOT'
-    compileOnly group: 'io.papermc.paper', name: 'Paper-Server', version: '1.17-R0.1-SNAPSHOT', classifier: 'reobf'
+    paperweightDevelopmentBundle 'io.papermc.paper:dev-bundle:1.18.1-R0.1-SNAPSHOT'
 }
 
 group = 'gg.packetloss'
-version = '1.17.0.0'
+version = '1.18.1.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(16)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
