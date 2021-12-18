@@ -30,10 +30,22 @@ java {
     }
 }
 
+// Butcher the dev jar so as to publish a properly obfuscated jar
+def javaComponent = components.java as AdhocComponentWithVariants
+javaComponent.withVariantsFromConfiguration(configurations.apiElements) {
+    skip()
+}
+javaComponent.withVariantsFromConfiguration(configurations.runtimeElements) {
+    skip()
+}
+javaComponent.addVariantsFromConfiguration(configurations.reobf) {
+    mapToMavenScope("compile")
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
-            from components.java
+            from javaComponent
         }
     }
 
