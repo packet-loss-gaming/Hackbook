@@ -32,6 +32,6 @@ public class DataMigrator {
     }
 
     public static int getCurrentVersion() {
-        return SharedConstants.getCurrentVersion().getWorldVersion();
+        return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
     }
 }
