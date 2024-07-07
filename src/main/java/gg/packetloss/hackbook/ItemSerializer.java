@@ -6,11 +6,12 @@
 
 package gg.packetloss.hackbook;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.*;
+import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang.Validate;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -21,9 +22,17 @@ import java.util.Collection;
 import java.util.List;
 
 public class ItemSerializer {
+    private static RegistryAccess.Frozen getRegistry() {
+        return MinecraftServer.getServer().registryAccess();
+    }
+
     private static CompoundTag toTag(ItemStack stack) {
         CompoundTag compound = new CompoundTag();
-        CraftItemStack.asNMSCopy(stack).save(compound);
+        if (stack == null || stack.getType().isAir()) {
+            compound.put("HACKBOOK_AIR_ITEM", IntTag.valueOf(1));
+        } else {
+            CraftItemStack.asNMSCopy(stack).save(getRegistry(), compound);
+        }
         return compound;
     }
 
@@ -50,7 +59,7 @@ public class ItemSerializer {
     }
 
     public static List<ItemStack> fromInputStream(InputStream stream, boolean migrate) throws IOException {
-        CompoundTag compoundTag = NbtIo.readCompressed(stream);
+        CompoundTag compoundTag = NbtIo.readCompressed(stream, NbtAccounter.unlimitedHeap());
 
         ListTag tag = (ListTag) compoundTag.get("elements");
 
@@ -62,11 +71,20 @@ public class ItemSerializer {
         for (int i = 0; i < tag.size(); ++i) {
             CompoundTag itemTag = tag.getCompound(i);
 
-            if (migrate) {
-                itemTag = DataMigrator.updateItemStack(prevVersion, itemTag);
-            }
+            if (itemTag.contains("HACKBOOK_AIR_ITEM")) {
+                stacks.add(new ItemStack(Material.AIR));
+            } else {
+                if (migrate) {
+                    itemTag = DataMigrator.updateItemStack(prevVersion, itemTag);
+                }
 
-            stacks.add(CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.of(itemTag)));
+                var optItem = net.minecraft.world.item.ItemStack.parse(getRegistry(), itemTag);
+                if (optItem.isPresent()) {
+                    stacks.add(CraftItemStack.asCraftMirror(optItem.get()));
+                } else {
+                    stacks.add(new ItemStack(Material.AIR));
+                }
+            }
         }
 
         return stacks;

@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'io.papermc.paperweight.userdev' version '1.3.8'
+    id 'io.papermc.paperweight.userdev' version '1.7.1'
 }
 
 repositories {
@@ -18,34 +18,22 @@ repositories {
 }
 
 dependencies {
-    paperweightDevelopmentBundle 'io.papermc.paper:dev-bundle:1.20.1-R0.1-SNAPSHOT'
+    paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
 }
 
 group = 'gg.packetloss'
-version = '1.20.1.0'
+version = '1.21.0.4'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
-}
-
-// Butcher the dev jar so as to publish a properly obfuscated jar
-def javaComponent = components.java as AdhocComponentWithVariants
-javaComponent.withVariantsFromConfiguration(configurations.apiElements) {
-    skip()
-}
-javaComponent.withVariantsFromConfiguration(configurations.runtimeElements) {
-    skip()
-}
-javaComponent.addVariantsFromConfiguration(configurations.reobf) {
-    mapToMavenScope("compile")
 }
 
 publishing {
     publications {
         maven(MavenPublication) {
-            from javaComponent
+            from components.java
         }
     }
 
