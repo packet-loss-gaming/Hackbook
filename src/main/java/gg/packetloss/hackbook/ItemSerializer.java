@@ -26,22 +26,18 @@ public class ItemSerializer {
         return MinecraftServer.getServer().registryAccess();
     }
 
-    private static CompoundTag toTag(ItemStack stack) {
-        CompoundTag compound = new CompoundTag();
+    private static Tag toTag(ItemStack stack) {
         if (stack == null || stack.getType().isAir()) {
+            CompoundTag compound = new CompoundTag();
             compound.put("HACKBOOK_AIR_ITEM", IntTag.valueOf(1));
-        } else {
-            CraftItemStack.asNMSCopy(stack).save(getRegistry(), compound);
+            return compound;
         }
-        return compound;
+
+        return CraftItemStack.asNMSCopy(stack).save(getRegistry());
     }
 
     public static String toJSON(ItemStack stack) {
         return toTag(stack).toString();
-    }
-
-    public static void writeToOutputStream(ItemStack stack, OutputStream stream) throws IOException {
-        NbtIo.writeCompressed(toTag(stack), stream);
     }
 
     public static void writeToOutputStream(Collection<ItemStack> stacks, OutputStream stream) throws IOException {
@@ -49,7 +45,8 @@ public class ItemSerializer {
 
         ListTag tag = new ListTag();
         for (ItemStack stack : stacks) {
-            tag.add(toTag(stack));
+            Tag producedTag = toTag(stack);
+            tag.add(producedTag);
         }
 
         compoundTag.put("elements", tag);
